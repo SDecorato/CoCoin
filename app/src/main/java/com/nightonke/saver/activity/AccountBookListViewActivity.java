@@ -184,6 +184,7 @@ public class AccountBookListViewActivity extends AppCompatActivity
             record.set(RecordManager.RECORDS.get(i));
             RecordManager.getInstance(CoCoinApplication.getAppContext()).SELECTED_RECORDS.add(record);
         }
+
         RecordManager.getInstance(CoCoinApplication.getAppContext()).SELECTED_SUM = Double.valueOf(RecordManager.getInstance(CoCoinApplication.getAppContext()).SUM);
         originalSum = RecordManager.getInstance(CoCoinApplication.getAppContext()).SELECTED_SUM;
 
