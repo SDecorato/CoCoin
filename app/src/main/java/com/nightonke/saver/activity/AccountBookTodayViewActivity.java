@@ -710,44 +710,27 @@ public class AccountBookTodayViewActivity extends AppCompatActivity {
 
     @Override
     public void onResume() {
+        SettingManager Instance=SettingManager.getInstance();
 
         if (mDemoSlider != null) mDemoSlider.startAutoCycle();
 
         super.onResume();
 
-        if (SettingManager.getInstance().getTodayViewPieShouldChange()) {
-            todayModeAdapter.notifyDataSetChanged();
-            SettingManager.getInstance().setTodayViewPieShouldChange(Boolean.FALSE);
+        OnResumeModeAdapter(Instance);
+
+        if (Instance.getTodayViewTitleShouldChange()) {
+            title.setText(Instance.getAccountBookName());
+            Instance.setTodayViewTitleShouldChange(false);
         }
 
-        if (SettingManager.getInstance().getTodayViewTitleShouldChange()) {
-            title.setText(SettingManager.getInstance().getAccountBookName());
-            SettingManager.getInstance().setTodayViewTitleShouldChange(false);
-        }
 
-        if (SettingManager.getInstance().getRecordIsUpdated()) {
-            todayModeAdapter.notifyDataSetChanged();
-            SettingManager.getInstance().setRecordIsUpdated(false);
-        }
-
-        if (SettingManager.getInstance().getTodayViewMonthExpenseShouldChange()) {
-            if (SettingManager.getInstance().getIsMonthLimit()) {
-                monthExpenseTip.setVisibility(View.VISIBLE);
-                monthExpense.withNumber(
-                        RecordManager.getCurrentMonthExpense()).setDuration(500).start();
-            } else {
-                monthExpenseTip.setVisibility(View.INVISIBLE);
-                monthExpense.setVisibility(View.INVISIBLE);
-            }
-        }
-
-        if (SettingManager.getInstance().getTodayViewLogoShouldChange()) {
+        if (Instance.getTodayViewLogoShouldChange()) {
             loadLogo();
-            SettingManager.getInstance().setTodayViewLogoShouldChange(false);
+            Instance.setTodayViewLogoShouldChange(false);
         }
 
-        if (SettingManager.getInstance().getTodayViewInfoShouldChange()) {
-            setIconEnable(syncIcon, SettingManager.getInstance().getLoggenOn());
+        if (Instance.getTodayViewInfoShouldChange()) {
+            setIconEnable(syncIcon, Instance.getLoggenOn());
             User user = BmobUser.getCurrentUser(CoCoinApplication.getAppContext(), User.class);
             if (user != null) {
                 userName.setText(user.getUsername());
@@ -758,7 +741,30 @@ public class AccountBookTodayViewActivity extends AppCompatActivity {
                 userEmail.setText("");
                 loadLogo();
             }
-            SettingManager.getInstance().setTodayViewInfoShouldChange(false);
+            Instance.setTodayViewInfoShouldChange(false);
+        }
+    }
+    private void OnResumeModeAdapter(SettingManager Instance){
+
+        if (Instance.getTodayViewPieShouldChange()) {
+            todayModeAdapter.notifyDataSetChanged();
+            SettingManager.getInstance().setTodayViewPieShouldChange(Boolean.FALSE);
+        }
+
+        if (Instance.getRecordIsUpdated()) {
+            todayModeAdapter.notifyDataSetChanged();
+            SettingManager.getInstance().setRecordIsUpdated(false);
+        }
+
+        if (Instance.getTodayViewMonthExpenseShouldChange()) {
+            if (Instance.getIsMonthLimit()) {
+                monthExpenseTip.setVisibility(View.VISIBLE);
+                monthExpense.withNumber(
+                        RecordManager.getCurrentMonthExpense()).setDuration(500).start();
+            } else {
+                monthExpenseTip.setVisibility(View.INVISIBLE);
+                monthExpense.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
