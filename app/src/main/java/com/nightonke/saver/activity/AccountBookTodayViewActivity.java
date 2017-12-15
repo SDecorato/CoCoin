@@ -360,55 +360,7 @@ public class AccountBookTodayViewActivity extends AppCompatActivity {
             myQuery.query.findObjects(CoCoinApplication.getAppContext(), new FindListener<UploadInfo>() {
                 @Override
                 public void onSuccess(List<UploadInfo> object) {
-                    if (myQuery.getTask() != TaskManager.QUERY_UPDATE_TASK) return;
-                    else {
-                        syncQueryDialog.dismiss();
-                        cloudRecordNumber = 0;
-                        Calendar cal = null;
-                        if (object.size() == 0) {
-
-                        } else {
-                            cloudRecordNumber = object.get(0).getRecordNumber();
-                            cloudOldDatabaseUrl = object.get(0).getDatabaseUrl();
-                            cloudOldDatabaseFileName = object.get(0).getFileName();
-                            uploadObjectId = object.get(0).getObjectId();
-                            cal = Calendar.getInstance();
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            try {
-                                cal.setTime(sdf.parse(object.get(0).getUpdatedAt()));
-                            } catch (ParseException p) {
-
-                            }
-                        }
-                        String content
-                                = CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_cloud_record_0)
-                                + cloudRecordNumber
-                                + CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_cloud_record_1)
-                                + (cal == null ? CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_cloud_time_2) : CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_cloud_time_0) + CoCoinUtil.GetCalendarString(CoCoinApplication.getAppContext(), cal) + CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_cloud_time_1))
-                                + CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_mobile_record_0)
-                                + RecordManager.getInstance(CoCoinApplication.getAppContext()).RECORDS.size()
-                                + CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_mobile_record_1)
-                                + (SettingManager.getInstance().getRecentlySyncTime() == null ? CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_mobile_time_2) : CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_mobile_time_0) + CoCoinUtil.GetCalendarString(CoCoinApplication.getAppContext(), SettingManager.getInstance().getRecentlySyncTime()) + CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_mobile_time_1))
-                                + CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_choose_content);
-                        syncChooseDialog = new MaterialDialog.Builder(mContext)
-                                .title(R.string.sync_choose_title)
-                                .content(content)
-                                .positiveText(R.string.sync_to_cloud)
-                                .negativeText(R.string.sync_to_mobile)
-                                .neutralText(R.string.cancel)
-                                .onAny(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        syncChooseDialog.dismiss();
-                                        if (which == DialogAction.POSITIVE) {
-                                            syncToCloud(user);
-                                        } else if (which == DialogAction.NEGATIVE) {
-                                            syncToMobile();
-                                        }
-                                    }
-                                })
-                                .show();
-                    }
+                    onSuccesSync(object,myQuery,user);
                 }
                 @Override
                 public void onError(int code, String msg) {
@@ -425,7 +377,61 @@ public class AccountBookTodayViewActivity extends AppCompatActivity {
         }
     }
 
-    void syncToCloud( User user){
+    private void onSuccesSync(List<UploadInfo> object,MyQuery MyQuery,User User){
+        final User user=User;
+        final MyQuery myQuery=MyQuery;
+        if (myQuery.getTask() != TaskManager.QUERY_UPDATE_TASK) return;
+        else {
+            syncQueryDialog.dismiss();
+            cloudRecordNumber = 0;
+            Calendar cal = null;
+            if (object.size() == 0) {
+
+            } else {
+                cloudRecordNumber = object.get(0).getRecordNumber();
+                cloudOldDatabaseUrl = object.get(0).getDatabaseUrl();
+                cloudOldDatabaseFileName = object.get(0).getFileName();
+                uploadObjectId = object.get(0).getObjectId();
+                cal = Calendar.getInstance();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                try {
+                    cal.setTime(sdf.parse(object.get(0).getUpdatedAt()));
+                } catch (ParseException p) {
+
+                }
+            }
+            String content
+                    = CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_cloud_record_0)
+                    + cloudRecordNumber
+                    + CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_cloud_record_1)
+                    + (cal == null ? CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_cloud_time_2) : CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_cloud_time_0) + CoCoinUtil.GetCalendarString(CoCoinApplication.getAppContext(), cal) + CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_cloud_time_1))
+                    + CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_mobile_record_0)
+                    + RecordManager.getInstance(CoCoinApplication.getAppContext()).RECORDS.size()
+                    + CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_mobile_record_1)
+                    + (SettingManager.getInstance().getRecentlySyncTime() == null ? CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_mobile_time_2) : CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_mobile_time_0) + CoCoinUtil.GetCalendarString(CoCoinApplication.getAppContext(), SettingManager.getInstance().getRecentlySyncTime()) + CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_info_mobile_time_1))
+                    + CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.sync_choose_content);
+            syncChooseDialog = new MaterialDialog.Builder(mContext)
+                    .title(R.string.sync_choose_title)
+                    .content(content)
+                    .positiveText(R.string.sync_to_cloud)
+                    .negativeText(R.string.sync_to_mobile)
+                    .neutralText(R.string.cancel)
+                    .onAny(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            syncChooseDialog.dismiss();
+                            if (which == DialogAction.POSITIVE) {
+                                syncToCloud(user);
+                            } else if (which == DialogAction.NEGATIVE) {
+                                syncToMobile();
+                            }
+                        }
+                    })
+                    .show();
+        }
+    }
+
+    void syncToCloud(User user){
         // sync to cloud
         //User user = BmobUser.getCurrentUser(CoCoinApplication.getAppContext(), User.class);
         String subContent = "";
