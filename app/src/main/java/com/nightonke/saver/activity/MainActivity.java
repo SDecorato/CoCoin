@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity
 
     private GuillotineAnimation animation;
 
-    private String inputPassword = "";
+    private String inputPsw = "";
 
     private float x1, y1, x2, y2;
 
@@ -175,8 +175,6 @@ public class MainActivity extends AppCompatActivity
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(ContextCompat.getColor(mContext, R.color.statusBarColor));
-        } else{
-            // do something for phones running an SDK before lollipop
         }
 
         User user = BmobUser.getCurrentUser(CoCoinApplication.getAppContext(), User.class);
@@ -204,13 +202,11 @@ public class MainActivity extends AppCompatActivity
         editViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if (position == 1) {
-                    if (CoCoinFragmentManager.mainActivityEditRemarkFragment != null)
+                if (position == 1 && CoCoinFragmentManager.mainActivityEditRemarkFragment != null) {
                         CoCoinFragmentManager.mainActivityEditRemarkFragment.editRequestFocus();
-                } else {
-                    if (CoCoinFragmentManager.mainActivityEditMoneyFragment != null)
+                } else
                         CoCoinFragmentManager.mainActivityEditMoneyFragment.editRequestFocus();
-                }
+
             }
 
             @Override
@@ -313,7 +309,7 @@ public class MainActivity extends AppCompatActivity
                         radioButton1.setChecked(false);
                         radioButton2.setChecked(false);
                         radioButton3.setChecked(false);
-                        inputPassword = "";
+                        inputPsw = "";
                         statusButton.setState(MaterialMenuDrawable.IconState.ARROW);
                     }
                 })
@@ -343,6 +339,8 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    ////END ONCREATE
+
     private AdapterView.OnItemLongClickListener gridViewLongClickListener
             = new AdapterView.OnItemLongClickListener() {
         @Override
@@ -356,10 +354,10 @@ public class MainActivity extends AppCompatActivity
 
 
     private void checkPassword() {
-        if (inputPassword.length() != 4) {
+        if (inputPsw.length() != 4) {
             return;
         }
-        if (SettingManager.getInstance().getPassword().equals(inputPassword)) {
+        if (SettingManager.getInstance().getPassword().equals(inputPsw)) {
             isLoading = true;
             YoYo.with(Techniques.Bounce).delay(0).duration(1000).playOn(radioButton3);
             statusButton.animateState(MaterialMenuDrawable.IconState.CHECK);
@@ -388,7 +386,7 @@ public class MainActivity extends AppCompatActivity
             radioButton1.setChecked(false);
             radioButton2.setChecked(false);
             radioButton3.setChecked(false);
-            inputPassword = "";
+            inputPsw = "";
             statusButton.animateState(MaterialMenuDrawable.IconState.X);
         }
     }
@@ -433,31 +431,86 @@ public class MainActivity extends AppCompatActivity
         if (!isPassword) {
             if (CoCoinFragmentManager.mainActivityEditMoneyFragment.getNumberText().toString().equals("0")
                     && !CoCoinUtil.ClickButtonCommit(position)) {
-                if (CoCoinUtil.ClickButtonDelete(position)
-                        || CoCoinUtil.ClickButtonIsZero(position)) {
+                CoCoinFragmentManager.mainActivityEditMoneyFragment.setNumberText(CoCoinUtil.BUTTONS[position]);
 
-                } else {
-                    CoCoinFragmentManager.mainActivityEditMoneyFragment.setNumberText(CoCoinUtil.BUTTONS[position]);
-                }
+                CoCoinFragmentManager.mainActivityEditMoneyFragment
+                        .setHelpText(CoCoinUtil.FLOATINGLABELS[
+                                CoCoinFragmentManager.mainActivityEditMoneyFragment.getNumberText().toString().length()]);
             } else {
-                if (CoCoinUtil.ClickButtonDelete(position)) {
-                    if (longClick) {
+                if (CoCoinUtil.ClickButtonDelete(position) && longClick) {
+
                         CoCoinFragmentManager.mainActivityEditMoneyFragment.setNumberText("0");
                         CoCoinFragmentManager.mainActivityEditMoneyFragment.setHelpText(
                                 CoCoinUtil.FLOATINGLABELS[CoCoinFragmentManager.mainActivityEditMoneyFragment
                                         .getNumberText().toString().length()]);
-                    } else {
+
+                        radioButton0.setChecked(false);
+                        radioButton1.setChecked(false);
+                        radioButton2.setChecked(false);
+                        radioButton3.setChecked(false);
+                        inputPsw = "";
+
                         CoCoinFragmentManager.mainActivityEditMoneyFragment.setNumberText(
                                 CoCoinFragmentManager.mainActivityEditMoneyFragment.getNumberText().toString()
-                                .substring(0, CoCoinFragmentManager.mainActivityEditMoneyFragment
-                                        .getNumberText().toString().length() - 1));
+                                        .substring(0, CoCoinFragmentManager.mainActivityEditMoneyFragment
+                                                .getNumberText().toString().length() - 1));
                         if (CoCoinFragmentManager.mainActivityEditMoneyFragment
                                 .getNumberText().toString().length() == 0) {
                             CoCoinFragmentManager.mainActivityEditMoneyFragment.setNumberText("0");
                             CoCoinFragmentManager.mainActivityEditMoneyFragment.setHelpText(" ");
+                        } else {
+
+                            switch (inputPsw.length()) {
+                                case 0:
+                                    inputPsw = "";
+                                    break;
+                                case 1:
+                                    radioButton0.setChecked(false);
+                                    break;
+                                case 2:
+                                    radioButton1.setChecked(false);
+                                    break;
+                                case 3:
+                                    radioButton2.setChecked(false);
+                                    break;
+                                default:
+                                    radioButton3.setChecked(false);
+                                    inputPsw = inputPsw.substring(0, inputPsw.length() - 1);
+                            }
                         }
+
+
                     }
-                } else if (CoCoinUtil.ClickButtonCommit(position)) {
+                    if (statusButton.getState() == MaterialMenuDrawable.IconState.X) {
+                        statusButton.animateState(MaterialMenuDrawable.IconState.ARROW);
+                    }
+
+                    switch (inputPsw.length()) {
+                        case 0:
+                            radioButton0.setChecked(true);
+                            YoYo.with(Techniques.Bounce).delay(0).duration(1000).playOn(radioButton0);
+                            inputPsw += CoCoinUtil.BUTTONS[position];
+                            break;
+                        case 1:
+                            radioButton0.setChecked(true);
+                            YoYo.with(Techniques.Bounce).delay(1).duration(1000).playOn(radioButton1);
+                            inputPsw += CoCoinUtil.BUTTONS[position];
+                            break;
+                        case 2:
+                            radioButton0.setChecked(true);
+                            YoYo.with(Techniques.Bounce).delay(2).duration(1000).playOn(radioButton2);
+                            inputPsw += CoCoinUtil.BUTTONS[position];
+                            break;
+                        case 3:
+                            radioButton0.setChecked(true);
+                            YoYo.with(Techniques.Bounce).delay(3).duration(1000).playOn(radioButton3);
+                            inputPsw += CoCoinUtil.BUTTONS[position];
+                            break;
+                    }
+                }
+                checkPassword();
+
+                if (CoCoinUtil.ClickButtonCommit(position)) {
                     commit();
                 } else {
                     CoCoinFragmentManager.mainActivityEditMoneyFragment.setNumberText(
@@ -465,57 +518,10 @@ public class MainActivity extends AppCompatActivity
                                     + CoCoinUtil.BUTTONS[position]);
                 }
             }
-            CoCoinFragmentManager.mainActivityEditMoneyFragment
-                    .setHelpText(CoCoinUtil.FLOATINGLABELS[
-                            CoCoinFragmentManager.mainActivityEditMoneyFragment.getNumberText().toString().length()]);
-        } else {
-            if (CoCoinUtil.ClickButtonDelete(position)) {
-                if (longClick) {
-                    radioButton0.setChecked(false);
-                    radioButton1.setChecked(false);
-                    radioButton2.setChecked(false);
-                    radioButton3.setChecked(false);
-                    inputPassword = "";
-                } else {
-                    if (inputPassword.length() == 0) {
-                        inputPassword = "";
-                    } else {
-                        if (inputPassword.length() == 1) {
-                            radioButton0.setChecked(false);
-                        } else if (inputPassword.length() == 2) {
-                            radioButton1.setChecked(false);
-                        } else if (inputPassword.length() == 3) {
-                            radioButton2.setChecked(false);
-                        } else {
-                            radioButton3.setChecked(false);
-                        }
-                        inputPassword = inputPassword.substring(0, inputPassword.length() - 1);
-                    }
-                }
-            } else if (CoCoinUtil.ClickButtonCommit(position)) {
-            } else {
-                if (statusButton.getState() == MaterialMenuDrawable.IconState.X) {
-                    statusButton.animateState(MaterialMenuDrawable.IconState.ARROW);
-                }
-                if (inputPassword.length() == 0) {
-                    radioButton0.setChecked(true);
-                    YoYo.with(Techniques.Bounce).delay(0).duration(1000).playOn(radioButton0);
-                } else if (inputPassword.length() == 1) {
-                    radioButton1.setChecked(true);
-                    YoYo.with(Techniques.Bounce).delay(0).duration(1000).playOn(radioButton1);
-                } else if (inputPassword.length() == 2) {
-                    radioButton2.setChecked(true);
-                    YoYo.with(Techniques.Bounce).delay(0).duration(1000).playOn(radioButton2);
-                } else if (inputPassword.length() == 3) {
-                    radioButton3.setChecked(true);
-                }
-                if (inputPassword.length() < 4) {
-                    inputPassword += CoCoinUtil.BUTTONS[position];
-                }
-            }
-            checkPassword();
         }
     }
+
+    //END BUTTONCLICKOPERATION
 
     private void commit() {
         if (CoCoinFragmentManager.mainActivityEditMoneyFragment.getTagId() == -1) {
@@ -576,10 +582,10 @@ public class MainActivity extends AppCompatActivity
                 CoCoinToast.getInstance().showToast(CoCoinApplication.getAppContext()
                         .getResources().getString(R.string.welcome_back)
                         + "\n" + SettingManager.getInstance().getUserName(), SuperToast.Background.BLUE);
-            default:
-                break;
         }
     }
+
+    //END SHOWTOAST
 
     private void changeColor() {
         boolean shouldChange
@@ -627,6 +633,8 @@ public class MainActivity extends AppCompatActivity
         myGridViewAdapter.notifyDataSetInvalidated();
     }
 
+    
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
 
@@ -641,15 +649,11 @@ public class MainActivity extends AppCompatActivity
                 x2 = ev.getX();
                 y2 = ev.getY();
                 if (Math.abs(y2 - y1) > Math.abs(x2 - x1)) {
-                    if (y2 - y1 > 300) {
-                        if (!isPassword) {
+                    if (y2 - y1 > 300 && !isPassword ) {
                             animation.open();
-                        }
                     }
-                    if (y1 - y2 > 300) {
-                        if (isPassword) {
+                    if (y1 - y2 > 300 && isPassword) {
                             animation.close();
-                        }
                     }
                 } else {
                     if (editViewPager.getCurrentItem() == 0
@@ -720,7 +724,7 @@ public class MainActivity extends AppCompatActivity
         radioButton3.setChecked(false);
 
         isLoading = false;
-        inputPassword = "";
+        inputPsw = "";
         System.gc();
     }
 

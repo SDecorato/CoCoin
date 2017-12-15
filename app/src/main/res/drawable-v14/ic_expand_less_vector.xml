@@ -32,9 +32,7 @@
 
         <path
             android:fillColor="#000000"
-            android:pathData="@string/path_expand_less"
-            app:vc_fillColor="#000000"
-            app:vc_pathData="@string/path_expand_less"/>
+            app:vc_fillColor="#000000" />
     </group>
 
 </vector>

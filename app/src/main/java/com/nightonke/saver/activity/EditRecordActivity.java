@@ -196,47 +196,59 @@ public class EditRecordActivity extends AppCompatActivity
         }
     };
 
+
+    private void editRecordFragment(int position){
+        if (CoCoinUtil.ClickButtonDelete(position) || CoCoinUtil.ClickButtonIsZero(position)) {
+
+        } else {
+            CoCoinFragmentManager.editRecordActivityEditMoneyFragment.setNumberText(CoCoinUtil.BUTTONS[position]);
+        }
+    }
+
+    private void editSetTextNumber(int position){
+        if (FIRST_EDIT) {
+            CoCoinFragmentManager.editRecordActivityEditMoneyFragment.setNumberText(CoCoinUtil.BUTTONS[position]);
+            FIRST_EDIT = false;
+        } else {
+            CoCoinFragmentManager.editRecordActivityEditMoneyFragment
+                    .setNumberText(CoCoinFragmentManager.editRecordActivityEditMoneyFragment
+                            .getNumberText().toString() + CoCoinUtil.BUTTONS[position]);
+        }
+    }
+
+    private void clickDelete(boolean longClick){
+        if (longClick) {
+            CoCoinFragmentManager.editRecordActivityEditMoneyFragment.setNumberText("0");
+            CoCoinFragmentManager.editRecordActivityEditMoneyFragment.setHelpText(" ");
+            CoCoinFragmentManager.editRecordActivityEditMoneyFragment.setHelpText(
+                    CoCoinUtil.FLOATINGLABELS[CoCoinFragmentManager.editRecordActivityEditMoneyFragment
+                            .getNumberText().toString().length()]);
+        } else {
+            CoCoinFragmentManager.editRecordActivityEditMoneyFragment.setNumberText(
+                    CoCoinFragmentManager.editRecordActivityEditMoneyFragment.getNumberText().toString()
+                            .substring(0, CoCoinFragmentManager.editRecordActivityEditMoneyFragment
+                                    .getNumberText().toString().length() - 1));
+            if (CoCoinFragmentManager.editRecordActivityEditMoneyFragment.getNumberText().toString().length() == 0) {
+                CoCoinFragmentManager.editRecordActivityEditMoneyFragment.setNumberText("0");
+                CoCoinFragmentManager.editRecordActivityEditMoneyFragment.setHelpText(" ");
+            }
+        }
+    }
+
     private void buttonClickOperation(boolean longClick, int position) {
         if (IS_CHANGED) {
             return;
         }
-        if (CoCoinFragmentManager.editRecordActivityEditMoneyFragment.getNumberText().toString().equals("0")
-                && !CoCoinUtil.ClickButtonCommit(position)) {
-            if (CoCoinUtil.ClickButtonDelete(position)
-                    || CoCoinUtil.ClickButtonIsZero(position)) {
 
-            } else {
-                CoCoinFragmentManager.editRecordActivityEditMoneyFragment.setNumberText(CoCoinUtil.BUTTONS[position]);
-            }
+        if (CoCoinFragmentManager.editRecordActivityEditMoneyFragment.getNumberText().toString().equals("0") && !CoCoinUtil.ClickButtonCommit(position)) {
+            editRecordFragment(position);
         } else {
             if (CoCoinUtil.ClickButtonDelete(position)) {
-                if (longClick) {
-                    CoCoinFragmentManager.editRecordActivityEditMoneyFragment.setNumberText("0");
-                    CoCoinFragmentManager.editRecordActivityEditMoneyFragment.setHelpText(" ");
-                    CoCoinFragmentManager.editRecordActivityEditMoneyFragment.setHelpText(
-                            CoCoinUtil.FLOATINGLABELS[CoCoinFragmentManager.editRecordActivityEditMoneyFragment
-                                    .getNumberText().toString().length()]);
-                } else {
-                    CoCoinFragmentManager.editRecordActivityEditMoneyFragment.setNumberText(
-                            CoCoinFragmentManager.editRecordActivityEditMoneyFragment.getNumberText().toString()
-                            .substring(0, CoCoinFragmentManager.editRecordActivityEditMoneyFragment
-                                    .getNumberText().toString().length() - 1));
-                    if (CoCoinFragmentManager.editRecordActivityEditMoneyFragment.getNumberText().toString().length() == 0) {
-                        CoCoinFragmentManager.editRecordActivityEditMoneyFragment.setNumberText("0");
-                        CoCoinFragmentManager.editRecordActivityEditMoneyFragment.setHelpText(" ");
-                    }
-                }
+                clickDelete(longClick);
             } else if (CoCoinUtil.ClickButtonCommit(position)) {
                 commit();
             } else {
-                if (FIRST_EDIT) {
-                    CoCoinFragmentManager.editRecordActivityEditMoneyFragment.setNumberText(CoCoinUtil.BUTTONS[position]);
-                    FIRST_EDIT = false;
-                } else {
-                    CoCoinFragmentManager.editRecordActivityEditMoneyFragment
-                            .setNumberText(CoCoinFragmentManager.editRecordActivityEditMoneyFragment
-                                    .getNumberText().toString() + CoCoinUtil.BUTTONS[position]);
-                }
+                editSetTextNumber(position);
             }
         }
         CoCoinFragmentManager.editRecordActivityEditMoneyFragment.setHelpText(CoCoinUtil.FLOATINGLABELS[

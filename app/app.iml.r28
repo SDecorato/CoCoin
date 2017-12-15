@@ -95,17 +95,11 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/prebuild" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
-<<<<<<< .mine
-      <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
-      <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
-||||||| .r9
-=======
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/splits-support" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/tmp" />
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
->>>>>>> .r28
     </content>
     <orderEntry type="jdk" jdkName="Android API 23 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -163,7 +157,6 @@
     <orderEntry type="library" name="com.android.support:animated-vector-drawable-23.2.0" level="project" />
     <orderEntry type="library" name="com.wdullaer:materialdatetimepicker-2.1.1" level="project" />
     <orderEntry type="library" name="com.nispok:snackbar-2.11.0" level="project" />
-    <orderEntry type="library" name="__local_aars__:C.\Users\sdeco\AppData\Local\Android\Sdk\build-tools\26.0.2\renderscript\lib\renderscript-v8.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="com.android.support:support-fragment-26.0.0-alpha1" level="project" />
     <orderEntry type="library" name="com.github.lecho:hellocharts-library-1.5.8" level="project" />
     <orderEntry type="library" name="net.steamcrafted:materialiconlib-1.0.8" level="project" />

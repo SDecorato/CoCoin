@@ -56,9 +56,9 @@ public class EditPasswordActivity extends AppCompatActivity {
 
     private int CURRENT_STATE = VERIFY_STATE;
 
-    private String oldPassword = "";
-    private String newPassword = "";
-    private String againPassword = "";
+    private String oldPsw = "";
+    private String newPsw = "";
+    private String againPsw = "";
 
     private ViewPager viewPager;
     private FragmentPagerAdapter adapter;
@@ -91,7 +91,10 @@ public class EditPasswordActivity extends AppCompatActivity {
 
         viewPager = (ViewPager)findViewById(R.id.viewpager);
 
-        try {
+        /*
+        removed animation because this code provokes a reflection
+         */
+/*        try {
             Interpolator sInterpolator = new AccelerateInterpolator();
             Field mScroller;
             mScroller = ViewPager.class.getDeclaredField("mScroller");
@@ -103,7 +106,7 @@ public class EditPasswordActivity extends AppCompatActivity {
         } catch (NoSuchFieldException e) {
         } catch (IllegalArgumentException e) {
         } catch (IllegalAccessException e) {
-        }
+        }*/
 
         adapter = new PasswordChangeFragmentAdapter(getSupportFragmentManager());
 
@@ -181,124 +184,137 @@ public class EditPasswordActivity extends AppCompatActivity {
         }
     };
 
+
+    private void caseVerifyState(int position){
+        if (CoCoinUtil.ClickButtonDelete(position)) {
+            if (longClick) {
+                CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE].init();
+                oldPsw = "";
+            } else {
+                CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE]
+                        .clear(oldPsw.length() - 1);
+                if (oldPsw.length() != 0)
+                    oldPsw = oldPsw.substring(0, oldPsw.length() - 1);
+            }
+        } else if (CoCoinUtil.ClickButtonCommit(position)) {
+
+        } else {
+            CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE]
+                    .set(oldPsw.length());
+            oldPsw += CoCoinUtil.BUTTONS[position];
+            if (oldPsw.length() == 4) {
+                if (oldPsw.equals(SettingManager.getInstance().getPassword())) {
+                    // old password correct
+                    // notice that if the old password is correct,
+                    // we won't go back to VERIFY_STATE any more
+                    CURRENT_STATE = NEW_PASSWORD;
+                    viewPager.setCurrentItem(NEW_PASSWORD, true);
+                } else {
+                    // old password wrong
+                    CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE]
+                            .clear(4);
+                    showToast(0);
+                    oldPsw = "";
+                }
+            }
+        }
+    }
+
+    private void caseNewPass(int position){
+        if (CoCoinUtil.ClickButtonDelete(position)) {
+            if (longClick) {
+                CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE].init();
+                newPsw = "";
+            } else {
+                CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE]
+                        .clear(newPsw.length() - 1);
+                if (newPsw.length() != 0)
+                    newPsw = newPsw.substring(0, newPsw.length() - 1);
+            }
+        } else if (CoCoinUtil.ClickButtonCommit(position)) {
+
+        } else {
+            CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE]
+                    .set(newPsw.length());
+            newPsw += CoCoinUtil.BUTTONS[position];
+            if (newPsw.length() == 4) {
+                // finish the new password input
+                CURRENT_STATE = PASSWORD_AGAIN;
+                viewPager.setCurrentItem(PASSWORD_AGAIN, true);
+            }
+        }
+    }
+
+    private void casePassAgain(boolean longClick, int position){
+        if (CoCoinUtil.ClickButtonDelete(position)) {
+            if (longClick) {
+                CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE].init();
+                againPsw = "";
+            } else {
+                CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE]
+                        .clear(againPsw.length() - 1);
+                if (againPsw.length() != 0)
+                    againPsw = againPsw.substring(0, againPsw.length() - 1);
+            }
+        } else if (CoCoinUtil.ClickButtonCommit(position)) {
+
+        } else {
+            CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE]
+                    .set(againPsw.length());
+            againPsw += CoCoinUtil.BUTTONS[position];
+            if (againPsw.length() == 4) {
+                // if the password again is equal to the new password
+                if (againPsw.equals(newPsw)) {
+                    CURRENT_STATE = -1;
+                    showToast(2);
+                    SettingManager.getInstance().setPassword(newPsw);
+                    if (SettingManager.getInstance().getLoggenOn()) {
+                        User currentUser = BmobUser.getCurrentUser(
+                                CoCoinApplication.getAppContext(), User.class);
+                        currentUser.setAccountBookPassword(newPsw);
+                        currentUser.update(CoCoinApplication.getAppContext(),
+                                currentUser.getObjectId(), new UpdateListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Log.d("Saver", "Update password successfully.");
+                                    }
+
+                                    @Override
+                                    public void onFailure(int code, String msg) {
+                                        Log.d("Saver", "Update password failed.");
+                                    }
+                                });
+                    }
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            finish();
+                        }
+                    }, 1000);
+                } else {
+                    CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE].clear(4);
+                    CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE - 1].init();
+                    CURRENT_STATE = NEW_PASSWORD;
+                    viewPager.setCurrentItem(NEW_PASSWORD, true);
+                    newPsw = "";
+                    againPsw = "";
+                    showToast(1);
+                }
+            }
+        }
+    }
+
     private void buttonClickOperation(boolean longClick, int position) {
         switch (CURRENT_STATE) {
             case VERIFY_STATE:
-                if (CoCoinUtil.ClickButtonDelete(position)) {
-                    if (longClick) {
-                        CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE].init();
-                        oldPassword = "";
-                    } else {
-                        CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE]
-                                .clear(oldPassword.length() - 1);
-                        if (oldPassword.length() != 0)
-                            oldPassword = oldPassword.substring(0, oldPassword.length() - 1);
-                    }
-                } else if (CoCoinUtil.ClickButtonCommit(position)) {
-
-                } else {
-                    CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE]
-                            .set(oldPassword.length());
-                    oldPassword += CoCoinUtil.BUTTONS[position];
-                    if (oldPassword.length() == 4) {
-                        if (oldPassword.equals(SettingManager.getInstance().getPassword())) {
-                            // old password correct
-                            // notice that if the old password is correct,
-                            // we won't go back to VERIFY_STATE any more
-                            CURRENT_STATE = NEW_PASSWORD;
-                            viewPager.setCurrentItem(NEW_PASSWORD, true);
-                        } else {
-                            // old password wrong
-                            CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE]
-                                    .clear(4);
-                            showToast(0);
-                            oldPassword = "";
-                        }
-                    }
-                }
+                caseVerifyState(position);
                 break;
             case NEW_PASSWORD:
-                if (CoCoinUtil.ClickButtonDelete(position)) {
-                    if (longClick) {
-                        CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE].init();
-                        newPassword = "";
-                    } else {
-                        CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE]
-                                .clear(newPassword.length() - 1);
-                        if (newPassword.length() != 0)
-                            newPassword = newPassword.substring(0, newPassword.length() - 1);
-                    }
-                } else if (CoCoinUtil.ClickButtonCommit(position)) {
-
-                } else {
-                    CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE]
-                            .set(newPassword.length());
-                    newPassword += CoCoinUtil.BUTTONS[position];
-                    if (newPassword.length() == 4) {
-                        // finish the new password input
-                        CURRENT_STATE = PASSWORD_AGAIN;
-                        viewPager.setCurrentItem(PASSWORD_AGAIN, true);
-                    }
-                }
+                caseNewPass(position);
                 break;
             case PASSWORD_AGAIN:
-                if (CoCoinUtil.ClickButtonDelete(position)) {
-                    if (longClick) {
-                        CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE].init();
-                        againPassword = "";
-                    } else {
-                        CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE]
-                                .clear(againPassword.length() - 1);
-                        if (againPassword.length() != 0)
-                            againPassword = againPassword.substring(0, againPassword.length() - 1);
-                    }
-                } else if (CoCoinUtil.ClickButtonCommit(position)) {
-
-                } else {
-                    CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE]
-                            .set(againPassword.length());
-                    againPassword += CoCoinUtil.BUTTONS[position];
-                    if (againPassword.length() == 4) {
-                        // if the password again is equal to the new password
-                        if (againPassword.equals(newPassword)) {
-                            CURRENT_STATE = -1;
-                            showToast(2);
-                            SettingManager.getInstance().setPassword(newPassword);
-                            if (SettingManager.getInstance().getLoggenOn()) {
-                                User currentUser = BmobUser.getCurrentUser(
-                                        CoCoinApplication.getAppContext(), User.class);
-                                currentUser.setAccountBookPassword(newPassword);
-                                currentUser.update(CoCoinApplication.getAppContext(),
-                                        currentUser.getObjectId(), new UpdateListener() {
-                                            @Override
-                                            public void onSuccess() {
-                                                Log.d("Saver", "Update password successfully.");
-                                            }
-
-                                            @Override
-                                            public void onFailure(int code, String msg) {
-                                                Log.d("Saver", "Update password failed.");
-                                            }
-                                        });
-                            }
-                            final Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    finish();
-                                }
-                            }, 1000);
-                        } else {
-                            CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE].clear(4);
-                            CoCoinFragmentManager.passwordChangeFragment[CURRENT_STATE - 1].init();
-                            CURRENT_STATE = NEW_PASSWORD;
-                            viewPager.setCurrentItem(NEW_PASSWORD, true);
-                            newPassword = "";
-                            againPassword = "";
-                            showToast(1);
-                        }
-                    }
-                }
+                casePassAgain(longClick, position);
                 break;
             default:
                 break;

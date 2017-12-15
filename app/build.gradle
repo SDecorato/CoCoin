@@ -46,7 +46,8 @@ dependencies {
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
 
     // butterknife
-    compile 'com.jakewharton:butterknife:6.1.0'
+    compile 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 
     // material viewpager
     compile ('com.github.florent37:materialviewpager:1.1.2@aar'){
