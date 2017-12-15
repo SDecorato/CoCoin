@@ -79,6 +79,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import butterknife.OnClick;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.listener.FindListener;
@@ -193,32 +194,7 @@ public class AccountBookListViewActivity extends AppCompatActivity
 
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-
-        if (currentapiVersion >= Build.VERSION_CODES.LOLLIPOP) {
-            // Do something for lollipop and above versions
-            Window window = this.getWindow();
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(ContextCompat.getColor(mContext, R.color.statusBarColor));
-        } else{
-            // do something for phones running an SDK before lollipop
-            View statusBarView = (View)findViewById(R.id.status_bar_view);
-            statusBarView.getLayoutParams().height = CoCoinUtil.getStatusBarHeight();
-        }
-
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
-
-            final ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-                actionBar.setDisplayShowHomeEnabled(true);
-                actionBar.setDisplayShowTitleEnabled(true);
-                actionBar.setDisplayUseLogoEnabled(false);
-                actionBar.setHomeButtonEnabled(true);
-            }
-        }
+        checkCompatibility();
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawer, 0, 0);
         mDrawer.setDrawerListener(mDrawerToggle);
@@ -384,29 +360,6 @@ public class AccountBookListViewActivity extends AppCompatActivity
         titleSum.setTypeface(CoCoinUtil.typefaceLatoLight);
         titleSum.setText(RecordManager.getInstance(mContext).SELECTED_RECORDS.size() + "'s");
 
-//        titleSlider = (SliderLayout)findViewById(R.id.title_slider);
-//        titleSlider.getLayoutParams().height = 48;
-//        titleSlider.getLayoutParams().width = 400 - CoCoinUtil.dpToPx(60 * 2);
-//
-//        HashMap<String, Integer> urls2 = CoCoinUtil.getTransparentUrls();
-//
-//        CustomTitleSliderView customTitleSliderView = new CustomTitleSliderView(0 + "'s", CoCoinFragmentManager.NUMBER_SLIDER);
-//        customTitleSliderView
-//                .image(urls2.get("0"))
-//                .setScaleType(BaseSliderView.ScaleType.Fit);
-//        titleSlider.addSlider(customTitleSliderView);
-//
-//        customTitleSliderView = new CustomTitleSliderView(CoCoinUtil.GetInMoney(0), CoCoinFragmentManager.EXPENSE_SLIDER);
-//        customTitleSliderView
-//                .image(urls2.get("1"))
-//                .setScaleType(BaseSliderView.ScaleType.Fit);
-//        titleSlider.addSlider(customTitleSliderView);
-//
-//        titleSlider.setPresetTransformer(SliderLayout.Transformer.ZoomOut);
-//        titleSlider.setCustomAnimation(new DescriptionAnimation());
-//        titleSlider.setDuration(3000);
-//        titleSlider.setCustomIndicator((PagerIndicator) findViewById(R.id.custom_indicator));
-
         ((TextView)findViewById(R.id.tag_title)).setTypeface(CoCoinUtil.GetTypeface());
         ((TextView)findViewById(R.id.tag_title_expense)).setTypeface(CoCoinUtil.GetTypeface());
         ((TextView)findViewById(R.id.tag_title_time)).setTypeface(CoCoinUtil.GetTypeface());
@@ -449,6 +402,35 @@ public class AccountBookListViewActivity extends AppCompatActivity
         setConditions();
 
         loadLogo();
+    }
+
+    private void checkCompatibility(){
+        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+
+        if (currentapiVersion >= Build.VERSION_CODES.LOLLIPOP) {
+            // Do something for lollipop and above versions
+            Window window = this.getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(ContextCompat.getColor(mContext, R.color.statusBarColor));
+        } else{
+            // do something for phones running an SDK before lollipop
+            View statusBarView = (View)findViewById(R.id.status_bar_view);
+            statusBarView.getLayoutParams().height = CoCoinUtil.getStatusBarHeight();
+        }
+
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+
+            final ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setDisplayShowHomeEnabled(true);
+                actionBar.setDisplayShowTitleEnabled(true);
+                actionBar.setDisplayUseLogoEnabled(false);
+                actionBar.setHomeButtonEnabled(true);
+            }
+        }
     }
 
     private void setConditions() {
@@ -876,14 +858,6 @@ public class AccountBookListViewActivity extends AppCompatActivity
 
         SuperToast.cancelAllSuperToasts();
 
-//        titleSlider.stopAutoCycle();
-//        titleSlider.removeAllSliders();
-//        titleSlider.destroyDrawingCache();
-//        titleSlider = null;
-
-//        CoCoinFragmentManager.numberCustomTitleSliderView = null;
-//        CoCoinFragmentManager.expenseCustomTitleSliderView = null;
-
         doubleSliderClickListener = null;
 
         RecordManager.SELECTED_RECORDS.clear();
@@ -1000,45 +974,49 @@ public class AccountBookListViewActivity extends AppCompatActivity
                 .onAny(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        if (which == DialogAction.POSITIVE) {
-                            LEFT_MONEY = inputNumber;
-                            inputNumber = -1;
-                            new MaterialDialog.Builder(mContext)
-                                    .title(R.string.set_expense)
-                                    .content(R.string.set_right_expense)
-                                    .positiveText(R.string.ok)
-                                    .negativeText(R.string.cancel)
-                                    .inputType(InputType.TYPE_CLASS_NUMBER)
-                                    .input("≤" + (int)(double)CoCoinUtil.INPUT_MAX_EXPENSE, "", new MaterialDialog.InputCallback() {
-                                        @Override
-                                        public void onInput(MaterialDialog dialog, CharSequence input) {
-                                            try {
-                                                inputNumber = Double.valueOf(String.valueOf(input));
-                                                if (inputNumber < CoCoinUtil.INPUT_MIN_EXPENSE || inputNumber > CoCoinUtil.INPUT_MAX_EXPENSE)
-                                                    inputNumber = -1;
-                                            } catch (NumberFormatException n) {
-                                                inputNumber = -1;
-                                            }
-                                            if (inputNumber == -1) dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
-                                            else dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
-                                        }
-                                    })
-                                    .onAny(new MaterialDialog.SingleButtonCallback() {
-                                        @Override
-                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                            if (which == DialogAction.POSITIVE) {
-                                                RIGHT_MONEY = inputNumber;
-                                                setConditions();
-                                            }
-                                        }
-                                    })
-                                    .alwaysCallInputCallback()
-                                    .show();
-                        }
+                        OnClickAction(which);
                     }
                 })
                 .alwaysCallInputCallback()
                 .show();
+    }
+
+    private void OnClickAction(DialogAction which){
+        if (which == DialogAction.POSITIVE) {
+            LEFT_MONEY = inputNumber;
+            inputNumber = -1;
+            new MaterialDialog.Builder(mContext)
+                    .title(R.string.set_expense)
+                    .content(R.string.set_right_expense)
+                    .positiveText(R.string.ok)
+                    .negativeText(R.string.cancel)
+                    .inputType(InputType.TYPE_CLASS_NUMBER)
+                    .input("≤" + (int)(double)CoCoinUtil.INPUT_MAX_EXPENSE, "", new MaterialDialog.InputCallback() {
+                        @Override
+                        public void onInput(MaterialDialog dialog, CharSequence input) {
+                            try {
+                                inputNumber = Double.valueOf(String.valueOf(input));
+                                if (inputNumber < CoCoinUtil.INPUT_MIN_EXPENSE || inputNumber > CoCoinUtil.INPUT_MAX_EXPENSE)
+                                    inputNumber = -1;
+                            } catch (NumberFormatException n) {
+                                inputNumber = -1;
+                            }
+                            if (inputNumber == -1) dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
+                            else dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
+                        }
+                    })
+                    .onAny(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            if (which == DialogAction.POSITIVE) {
+                                RIGHT_MONEY = inputNumber;
+                                setConditions();
+                            }
+                        }
+                    })
+                    .alwaysCallInputCallback()
+                    .show();
+        }
     }
 
     private boolean isFrom = true;

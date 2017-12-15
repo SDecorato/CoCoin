@@ -431,9 +431,10 @@ public class AccountBookTodayViewActivity extends AppCompatActivity {
         }
     }
 
-    void syncToCloud(User user){
+
+    void syncToCloud(User User){
         // sync to cloud
-        //User user = BmobUser.getCurrentUser(CoCoinApplication.getAppContext(), User.class);
+        final User user=User;
         String subContent = "";
         if (RecordManager.getInstance(CoCoinApplication.getAppContext()).RECORDS.size() == 0) {
             subContent = CoCoinUtil.GetString(CoCoinApplication.getAppContext(), R.string.mobile_record_empty);
